@@ -13,7 +13,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OrderService {
+public class OrderService extends BaseService{
     private final OrderRepository orderRepo;
     private final MenuService menuService;
     private final PaymentService paymentService;
@@ -25,6 +25,7 @@ public class OrderService {
     }
 
     public long placeOrder(long customerId, List<OrderItem> itemsInput) {
+        log("Placing order for customer " + customerId);
         if (itemsInput == null || itemsInput.isEmpty()) {
             throw new InvalidQuantityException("Order must contain at least 1 item.");
         }
@@ -43,7 +44,6 @@ public class OrderService {
             total = total.add(menuItem.getPrice().multiply(BigDecimal.valueOf(it.getQuantity())));
             itemsToSave.add(it);
         }
-
 
         paymentService.pay(total);
 
