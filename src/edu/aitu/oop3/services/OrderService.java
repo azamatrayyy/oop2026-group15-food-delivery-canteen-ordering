@@ -12,12 +12,16 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import edu.aitu.oop3.util.Result;
 
+public Result<List<Order>> getActiveOrders() {
+    return Result.success(orderRepo.findByStatus(OrderStatus.ACTIVE));
+}
 public class OrderService extends BaseService{
     private final OrderRepository orderRepo;
     private final MenuService menuService;
     private final PaymentService paymentService;
-
+    Order order = OrderFactory.create("pickup", customerId);
     public OrderService(OrderRepository orderRepo, MenuService menuService, PaymentService paymentService) {
         this.orderRepo = orderRepo;
         this.menuService = menuService;
@@ -43,11 +47,26 @@ public class OrderService extends BaseService{
 
             total = total.add(menuItem.getPrice().multiply(BigDecimal.valueOf(it.getQuantity())));
             itemsToSave.add(it);
+            double tax = total.doubleValue() * TaxConfig.getInstance().getTaxRate();
+            total = total.add(BigDecimal.valueOf(tax));
+
         }
 
         paymentService.pay(total);
 
-        Order order = new Order(0, customerId, OrderStatus.ACTIVE, OffsetDateTime.now());
+        PricingRules pricing = PricingRules.getInstance();
+        BigDecimal finalTotal = pricing.calculateTotal(total);
+
+        Order order = new Order.Builder()
+                .customerId(customerId)
+                .build();
+
+        paymentService.pay(finalTotal);
+        BigDecimal totalWithTax =
+                TaxConfig.getInstance().applyTax(total);
+
+        paymentService.pay(totalWithTax);
+
         return orderRepo.createOrderWithItems(order, itemsToSave);
     }
 
