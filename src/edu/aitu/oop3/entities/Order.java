@@ -8,11 +8,11 @@ public class Order {
     private OrderStatus status;
     private OffsetDateTime createdAt;
 
-    public Order(long id, long customerId, OrderStatus status, OffsetDateTime createdAt) {
-        this.id = id;
-        this.customerId = customerId;
-        this.status = status;
-        this.createdAt = createdAt;
+    private Order(Builder builder) {
+        this.id = builder.id;
+        this.customerId = builder.customerId;
+        this.status = builder.status;
+        this.createdAt = builder.createdAt;
     }
 
     public long getId() { return id; }
@@ -22,6 +22,28 @@ public class Order {
 
     @Override
     public String toString() {
-        return "Order{id=" + id + ", customerId=" + customerId + ", status=" + status + ", createdAt=" + createdAt + "}";
+        return "Order{id=" + id + ", customerId=" + customerId +
+                ", status=" + status + ", createdAt=" + createdAt + "}";
+    }
+
+    public static class Builder {
+        private long id = 0;
+        private long customerId;
+        private OrderStatus status = OrderStatus.ACTIVE;
+        private OffsetDateTime createdAt = OffsetDateTime.now();
+
+        public Builder customerId(long customerId) {
+            this.customerId = customerId;
+            return this;
+        }
+
+        public Builder status(OrderStatus status) {
+            this.status = status;
+            return this;
+        }
+
+        public Order build() {
+            return new Order(this);
+        }
     }
 }
