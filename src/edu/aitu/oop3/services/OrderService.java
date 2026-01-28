@@ -1,7 +1,9 @@
 package edu.aitu.oop3.services;
 
-import edu.aitu.oop3.config.TaxConfig;
-import edu.aitu.oop3.entities.*;
+import edu.aitu.oop3.entities.MenuItem;
+import edu.aitu.oop3.entities.Order;
+import edu.aitu.oop3.entities.OrderItem;
+import edu.aitu.oop3.entities.OrderStatus;
 import edu.aitu.oop3.exceptions.InvalidQuantityException;
 import edu.aitu.oop3.exceptions.OrderNotFoundException;
 import edu.aitu.oop3.repositories.OrderRepository;
@@ -11,20 +13,17 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.aitu.oop3.services.pricing.PricingRules;
-import edu.aitu.oop3.util.Result;
-
 public class OrderService extends BaseService{
     private final OrderRepository orderRepo;
     private final MenuService menuService;
     private final PaymentService paymentService;
-    long customerId;
-    Order order = OrderFactory.create("pickup", customerId);
+
     public OrderService(OrderRepository orderRepo, MenuService menuService, PaymentService paymentService) {
         this.orderRepo = orderRepo;
         this.menuService = menuService;
         this.paymentService = paymentService;
     }
+
     public long placeOrder(long customerId, List<OrderItem> itemsInput) {
         log("Placing order for customer " + customerId);
         if (itemsInput == null || itemsInput.isEmpty()) {
@@ -44,26 +43,11 @@ public class OrderService extends BaseService{
 
             total = total.add(menuItem.getPrice().multiply(BigDecimal.valueOf(it.getQuantity())));
             itemsToSave.add(it);
-            double tax = total.doubleValue() * TaxConfig.getInstance().getTaxRate();
-            total = total.add(BigDecimal.valueOf(tax));
-
         }
 
         paymentService.pay(total);
 
-        PricingRules pricing = PricingRules.getInstance();
-        BigDecimal finalTotal = pricing.calculateTotal(total);
-
-        Order order = new Order.Builder()
-                .customerId(customerId)
-                .build();
-
-        paymentService.pay(finalTotal);
-        BigDecimal totalWithTax =
-                TaxConfig.getInstance().applyTax(total);
-
-        paymentService.pay(totalWithTax);
-
+        Order order = new Order(0, customerId, OrderStatus.ACTIVE, OffsetDateTime.now());
         return orderRepo.createOrderWithItems(order, itemsToSave);
     }
 
