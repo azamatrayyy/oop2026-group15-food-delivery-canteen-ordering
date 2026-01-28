@@ -1,12 +1,12 @@
 package edu.aitu.oop3.config;
-import edu.aitu.oop3.config.TaxConfig;
+import edu.aitu.oop3.config.TaxConfig
 public class TaxConfig {
     private static TaxConfig instance;
     private final double taxRate;
 
     private TaxConfig() {
         this.taxRate = 0.12;
-    }
+
     public static TaxConfig getInstance() {
         if (instance == null) {
             instance = new TaxConfig();

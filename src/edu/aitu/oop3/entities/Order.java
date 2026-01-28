@@ -7,8 +7,13 @@ public class Order {
     private long customerId;
     private OrderStatus status;
     private OffsetDateTime createdAt;
-
-    private Order(Builder builder) {
+    public Order(long id, long customerId, OrderStatus status, OffsetDateTime createdAt) {
+        this.id = id;
+        this.customerId = customerId;
+        this.status = status;
+        this.createdAt = createdAt;
+    }
+    protected Order(Builder builder) {
         this.id = builder.id;
         this.customerId = builder.customerId;
         this.status = builder.status;
