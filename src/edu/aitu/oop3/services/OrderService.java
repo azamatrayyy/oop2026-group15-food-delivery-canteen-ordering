@@ -1,9 +1,7 @@
 package edu.aitu.oop3.services;
 
-import edu.aitu.oop3.entities.MenuItem;
-import edu.aitu.oop3.entities.Order;
-import edu.aitu.oop3.entities.OrderItem;
-import edu.aitu.oop3.entities.OrderStatus;
+import edu.aitu.oop3.config.TaxConfig;
+import edu.aitu.oop3.entities.*;
 import edu.aitu.oop3.exceptions.InvalidQuantityException;
 import edu.aitu.oop3.exceptions.OrderNotFoundException;
 import edu.aitu.oop3.repositories.OrderRepository;
@@ -12,22 +10,21 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import edu.aitu.oop3.services.pricing.PricingRules;
 import edu.aitu.oop3.util.Result;
 
-public Result<List<Order>> getActiveOrders() {
-    return Result.success(orderRepo.findByStatus(OrderStatus.ACTIVE));
-}
 public class OrderService extends BaseService{
     private final OrderRepository orderRepo;
     private final MenuService menuService;
     private final PaymentService paymentService;
+    long customerId;
     Order order = OrderFactory.create("pickup", customerId);
     public OrderService(OrderRepository orderRepo, MenuService menuService, PaymentService paymentService) {
         this.orderRepo = orderRepo;
         this.menuService = menuService;
         this.paymentService = paymentService;
     }
-
     public long placeOrder(long customerId, List<OrderItem> itemsInput) {
         log("Placing order for customer " + customerId);
         if (itemsInput == null || itemsInput.isEmpty()) {
