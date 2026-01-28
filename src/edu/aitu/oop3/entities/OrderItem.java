@@ -7,7 +7,7 @@ public class OrderItem {
     private long orderId;
     private long menuItemId;
     private int quantity;
-    private BigDecimal priceAtOrder; // can be null before saving
+    private BigDecimal priceAtOrder;
 
     public OrderItem(long id, long orderId, long menuItemId, int quantity, BigDecimal priceAtOrder) {
         this.id = id;
