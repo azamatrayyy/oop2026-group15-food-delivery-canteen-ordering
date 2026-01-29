@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class OrderRepositoryImpl implements OrderRepository {
+public abstract class OrderRepositoryImpl implements OrderRepository {
     private final IDB db;
 
     public OrderRepositoryImpl(IDB db) {

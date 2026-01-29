@@ -7,9 +7,9 @@ import edu.aitu.oop3.entities.OrderStatus;
 import java.util.List;
 import java.util.Optional;
 
-public interface OrderRepository {
+    public interface OrderRepository extends Repository<Order> {
     long createOrderWithItems(Order order, List<OrderItem> items);
-    List<Order> findByStatus(OrderStatus status);
     Optional<Order> findById(long id);
     void updateStatus(long orderId, OrderStatus newStatus);
+    List<Order> findByStatus(OrderStatus status);
 }

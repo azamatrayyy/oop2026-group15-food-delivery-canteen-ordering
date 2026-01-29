@@ -78,7 +78,8 @@ public class Main {
                     orderService.markCompleted(orderId);
                     System.out.println("Order " + orderId + " marked as COMPLETED.");
 
-                } else if (choice.equals("0")) {
+                }
+                else if (choice.equals("0")) {
                     System.out.println("Bye!");
                     return;
                 } else {
