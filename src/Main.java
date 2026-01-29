@@ -2,7 +2,6 @@ import edu.aitu.oop3.db.IDB;
 import edu.aitu.oop3.db.PostgresDB;
 import edu.aitu.oop3.entities.Order;
 import edu.aitu.oop3.entities.OrderItem;
-import edu.aitu.oop3.entities.OrderStatus;
 import edu.aitu.oop3.entities.MenuItem;
 import edu.aitu.oop3.exceptions.InvalidQuantityException;
 import edu.aitu.oop3.exceptions.MenuItemNotAvailableException;
@@ -17,7 +16,6 @@ import edu.aitu.oop3.services.PaymentService;
 import edu.aitu.oop3.entities.orderType.OrderType;
 import edu.aitu.oop3.factories.OrderTypeFactory;
 import java.util.*;
-import edu.aitu.oop3.services.pricing.PricingRules;
 import java.math.BigDecimal;
 
 

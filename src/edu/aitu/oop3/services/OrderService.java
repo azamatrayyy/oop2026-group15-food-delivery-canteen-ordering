@@ -9,10 +9,9 @@ import edu.aitu.oop3.exceptions.OrderNotFoundException;
 import edu.aitu.oop3.repositories.OrderRepository;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import edu.aitu.oop3.services.pricing.PricingRules;
+import edu.aitu.oop3.services.PricingRules.PricingRules;
 import edu.aitu.oop3.entities.OrderBuilder;
 
 public class OrderService extends BaseService{
@@ -27,6 +26,7 @@ public class OrderService extends BaseService{
     }
 
     public long placeOrder(long customerId, List<OrderItem> itemsInput) {
+        log("Placing order for customer " + customerId);
         if (itemsInput == null || itemsInput.isEmpty()) {
             throw new InvalidQuantityException("Order must contain at least 1 item.");
         }
