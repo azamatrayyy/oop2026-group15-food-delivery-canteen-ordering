@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import edu.aitu.oop3.services.pricing.PricingRules;
+import edu.aitu.oop3.entities.OrderBuilder;
 
 public class OrderService extends BaseService{
     private final OrderRepository orderRepo;
@@ -25,7 +27,6 @@ public class OrderService extends BaseService{
     }
 
     public long placeOrder(long customerId, List<OrderItem> itemsInput) {
-        log("Placing order for customer " + customerId);
         if (itemsInput == null || itemsInput.isEmpty()) {
             throw new InvalidQuantityException("Order must contain at least 1 item.");
         }
@@ -34,21 +35,57 @@ public class OrderService extends BaseService{
         BigDecimal total = BigDecimal.ZERO;
 
         for (OrderItem it : itemsInput) {
+
             if (it.getQuantity() <= 0) {
-                throw new InvalidQuantityException("Invalid quantity for menuItemId=" + it.getMenuItemId());
+                throw new InvalidQuantityException(
+                        "Invalid quantity for menuItemId=" + it.getMenuItemId()
+                );
             }
 
-            MenuItem menuItem = menuService.getAvailableMenuItemOrThrow(it.getMenuItemId());
+            MenuItem menuItem =
+                    menuService.getAvailableMenuItemOrThrow(it.getMenuItemId());
+
             it.setPriceAtOrder(menuItem.getPrice());
 
-            total = total.add(menuItem.getPrice().multiply(BigDecimal.valueOf(it.getQuantity())));
+            total = total.add(
+                    menuItem.getPrice()
+                            .multiply(BigDecimal.valueOf(it.getQuantity()))
+            );
+
             itemsToSave.add(it);
         }
 
-        paymentService.pay(total);
+        PricingRules pricing = PricingRules.getInstance();
+        BigDecimal finalTotal = pricing.applyTax(total);
 
-        Order order = new Order(0, customerId, OrderStatus.ACTIVE, OffsetDateTime.now());
+        paymentService.pay(finalTotal);
+
+        Order order = new OrderBuilder()
+                .customer(customerId)
+                .status(OrderStatus.ACTIVE)
+                .build();
+
         return orderRepo.createOrderWithItems(order, itemsToSave);
+    }
+    public BigDecimal calculateOrderTotalWithTax(long orderId) {
+
+        Order order = orderRepo.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(
+                        "Order not found: " + orderId));
+
+        List<OrderItem> items = orderRepo.getItemsByOrderId(orderId);
+
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (OrderItem item : items) {
+            total = total.add(
+                    item.getPriceAtOrder()
+                            .multiply(BigDecimal.valueOf(item.getQuantity()))
+            );
+        }
+
+        PricingRules pricing = PricingRules.getInstance();
+        return pricing.applyTax(total);
     }
 
     public List<Order> getActiveOrders() {
