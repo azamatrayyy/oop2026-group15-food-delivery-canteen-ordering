@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public abstract class OrderRepositoryImpl implements OrderRepository {
+public class OrderRepositoryImpl implements OrderRepository {
     private final IDB db;
 
     public OrderRepositoryImpl(IDB db) {
@@ -84,6 +84,11 @@ public abstract class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
+    public Order save(Order entity) {
+        return null;
+    }
+
+    @Override
     public Optional<Order> findById(long id) {
         String sql = "select id, customer_id, status, created_at from orders where id = ?";
         try (Connection con = db.getConnection();
@@ -105,7 +110,6 @@ public abstract class OrderRepositoryImpl implements OrderRepository {
             throw new RuntimeException("DB error: " + e.getMessage(), e);
         }
     }
-
     @Override
     public void updateStatus(long orderId, OrderStatus newStatus) {
         String sql = "update orders set status = ? where id = ?";
@@ -122,6 +126,29 @@ public abstract class OrderRepositoryImpl implements OrderRepository {
 
         } catch (SQLException e) {
             throw new RuntimeException("DB error: " + e.getMessage(), e);
+        }
+    }
+    @Override
+    public List<Order> findAll() {
+        String sql = "SELECT id, customer_id, status, created_at FROM orders ORDER BY id DESC";
+        List<Order> list = new ArrayList<>();
+
+        try (Connection con = db.getConnection();
+             PreparedStatement st = con.prepareStatement(sql);
+             ResultSet rs = st.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(new Order(
+                        rs.getLong("id"),
+                        rs.getLong("customer_id"),
+                        OrderStatus.valueOf(rs.getString("status")),
+                        rs.getObject("created_at", OffsetDateTime.class)
+                ));
+            }
+            return list;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("DB error in findAll: " + e.getMessage(), e);
         }
     }
 }
