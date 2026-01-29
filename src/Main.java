@@ -14,8 +14,12 @@ import edu.aitu.oop3.repositories.impl.OrderRepositoryImpl;
 import edu.aitu.oop3.services.MenuService;
 import edu.aitu.oop3.services.OrderService;
 import edu.aitu.oop3.services.PaymentService;
-
+import edu.aitu.oop3.entities.orderType.OrderType;
+import edu.aitu.oop3.factories.OrderTypeFactory;
 import java.util.*;
+import edu.aitu.oop3.services.pricing.PricingRules;
+import java.math.BigDecimal;
+
 
 public class Main {
     public static void main(String[] args) {
@@ -37,6 +41,8 @@ public class Main {
             System.out.println("2) Place order");
             System.out.println("3) View active orders");
             System.out.println("4) Mark order completed");
+            System.out.println("5) Select order type");
+            System.out.println("6) Calculate order total by ID");
             System.out.println("0) Exit");
             System.out.print("Choose: ");
 
@@ -78,6 +84,31 @@ public class Main {
                     orderService.markCompleted(orderId);
                     System.out.println("Order " + orderId + " marked as COMPLETED.");
 
+                }
+                else if (choice.equals("5")) {
+                    System.out.println("=== NEW ORDER CONFIGURATION ===");
+                    System.out.println("1. Delivery");
+                    System.out.println("2. Dine-in");
+                    System.out.println("3. Pickup");
+                    System.out.print("Enter number (1-3): ");
+                    String typeChoice = sc.nextLine().trim();
+                    String typeString;
+                    typeString = switch (typeChoice) {
+                        case "1" -> "DELIVERY";
+                        case "2" -> "DINEIN";
+                        case "3" -> "PICKUP";
+                        default -> throw new IllegalArgumentException("Invalid option selected: " + typeChoice);
+                    };
+                    OrderType selectedType = OrderTypeFactory.create(typeString);
+                    System.out.println("Success! Type set to: " + selectedType.getType());
+                }
+                else if(choice.equals("6")) {
+                    System.out.print("Enter order ID: ");
+                    long orderId = Long.parseLong(sc.nextLine());
+
+                    BigDecimal total = orderService.calculateOrderTotalWithTax(orderId);
+
+                    System.out.println("Order total with tax = " + total);
                 }
                 else if (choice.equals("0")) {
                     System.out.println("Bye!");

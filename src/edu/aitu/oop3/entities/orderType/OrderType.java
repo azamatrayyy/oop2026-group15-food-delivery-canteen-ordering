@@ -1,4 +1,5 @@
 package edu.aitu.oop3.entities.orderType;
 
-public class OrderType {
+public interface OrderType {
+    String getType();
 }

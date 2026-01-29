@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
     public interface OrderRepository extends Repository<Order> {
-    long createOrderWithItems(Order order, List<OrderItem> items);
+        List<OrderItem> getItemsByOrderId(long orderId);
+        long createOrderWithItems(Order order, List<OrderItem> items);
     Optional<Order> findById(long id);
     void updateStatus(long orderId, OrderStatus newStatus);
     List<Order> findByStatus(OrderStatus status);
